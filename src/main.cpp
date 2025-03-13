@@ -7,6 +7,8 @@
 #include "Audio.h"
 #include "LCD.h"
 #include "secrets.h"
+#include "AnalogVolumeController.h"
+#include "VolumeManager.h"
 
 #include "esp32-hal-log.h"
 #define TAG "" // logging tag
@@ -40,14 +42,13 @@ Audio audio;
 void audio_init()
 {
 
-#define I2S_BCLK 26
-#define I2S_LRC 25
-#define I2S_DOUT 32
+  const int I2S_BCLK = 26;
+  const int I2S_LRC = 25;
+  const int I2S_DOUT = 32;
 
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
 
-  // Set volume (0 to 100)
-  audio.setVolume(21);
+  // the volume level will be set in the loop() func upon the first time when the pot value is read
 
   // Play an online radio stream
   audio.connecttohost("https://2.mystreaming.net:443/uber/crchopin/icecast.audio");
@@ -86,7 +87,16 @@ void setup()
   lcd.print("Playing", "classics");
 }
 
+// my potentiometer is on the 33rd GPIO
+const int potPin = 33;
+AnalogVolumeController volumeController(potPin);
+VolumeManager volumeManager(volumeController, audio);
+
 void loop()
 {
+  // keep streaming the audio
   audio.loop();
+
+  // keep reading the potentiometer and update the volume when needed
+  volumeManager.update();
 }
