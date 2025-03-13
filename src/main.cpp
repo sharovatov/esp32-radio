@@ -1,6 +1,6 @@
 /**********************************************************************
   Description : The simplest internet radio. The app connects to wifi
-                and streams one station to the headset
+                and streams one of the five hardcoded stations.
   Author      : Vitaly Sharovatov
 **********************************************************************/
 #include <WiFi.h>
