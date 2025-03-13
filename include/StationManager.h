@@ -53,7 +53,7 @@ public:
                     audio.stopSong();
                     audio.connecttohost(radioStations[stationNumber]);
 
-                    lcd.print("Playing:", stationNames[stationNumber]);
+                    lcd.printWithIcon(stationNames[stationNumber]);
 
                     ESP_LOGI(TAG, "Switched to station: %d — %s", stationNumber, radioStations[stationNumber]);
                 }

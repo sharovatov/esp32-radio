@@ -10,6 +10,15 @@ class LCD
 {
 private:
     LiquidCrystal_I2C lcd;
+    byte speakerIcon[8] = {
+        0b00001,
+        0b00011,
+        0b00111,
+        0b01111,
+        0b01111,
+        0b00111,
+        0b00011,
+        0b00001};
 
 public:
     LCD(uint8_t address = 0x27, uint8_t cols = 16, uint8_t rows = 2)
@@ -19,25 +28,38 @@ public:
     {
         lcd.init();
         lcd.backlight();
+
+        // store the icon in memory
+        lcd.createChar(0, speakerIcon);
     }
 
     void print(const char *topMessage, const char *bottomMessage)
     {
-        char topPadded[17];    // 16 chars + null terminator
-        char bottomPadded[17]; // 16 chars + null terminator
-
-        snprintf(topPadded, 17, "%-16s", topMessage);       // Left-align and pad with spaces
-        snprintf(bottomPadded, 17, "%-16s", bottomMessage); // Left-align and pad with spaces
-
         lcd.setCursor(0, 0);
-        lcd.print(topPadded);
+        lcd.print(padMessage(topMessage));
         lcd.setCursor(0, 1);
-        lcd.print(bottomPadded);
+        lcd.print(padMessage(bottomMessage));
     }
 
     void print(const char *message)
     {
         print(message, "");
+    }
+
+    void printWithIcon(const char *message)
+    {
+        lcd.setCursor(0, 0);
+        lcd.write(byte(0)); // the speaker icon
+        lcd.print(" ");
+        lcd.print(padMessage(message));
+    }
+
+private:
+    const char *padMessage(const char *message)
+    {
+        static char padded[17]; // 16 chars + null terminator
+        snprintf(padded, 17, "%-16s", message);
+        return padded;
     }
 };
 
