@@ -1,7 +1,7 @@
 #ifndef STATION_MANAGER_H
 #define STATION_MANAGER_H
 
-#include "AnalogStationController.h"
+#include "PotReader.h"
 #include "Audio.h"
 #include "esp32-hal-log.h"
 #include "LCD.h"
@@ -10,7 +10,7 @@
 class StationManager
 {
 private:
-    AnalogStationController &stationController;
+    PotReader &stationController;
     Audio &audio;
     LCD &lcd;
     unsigned long lastUpdate = 0;
@@ -34,7 +34,7 @@ private:
     const unsigned long updateInterval = 100; // 100ms update interval
 
 public:
-    StationManager(AnalogStationController &vc, Audio &aud, LCD &lcdScreen)
+    StationManager(PotReader &vc, Audio &aud, LCD &lcdScreen)
         : stationController(vc), audio(aud), lcd(lcdScreen) {}
 
     void update()

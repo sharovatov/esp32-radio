@@ -7,10 +7,9 @@
 #include "Audio.h"
 #include "LCD.h"
 #include "secrets.h"
-#include "AnalogVolumeController.h"
 #include "VolumeManager.h"
-#include "AnalogStationController.h"
 #include "StationManager.h"
+#include "PotReader.h"
 
 #include "esp32-hal-log.h"
 #define TAG "" // logging tag
@@ -85,15 +84,15 @@ void setup()
   lcd.print("Initializing...");
 }
 
-// volume pot is on GPIO 33
+// Volume potentiometer on GPIO 33, mapped to 0-21 for volume values
 constexpr int volumePotPin = 33;
-AnalogVolumeController volumeController(volumePotPin);
-VolumeManager volumeManager(volumeController, audio);
+PotReader volumeReader(volumePotPin, 21);
+VolumeManager volumeManager(volumeReader, audio, lcd);
 
-// stations pot is on GPIO 36
+// Station potentiometer on GPIO 36, mapped to 0-4 for station numbers
 constexpr int stationsPotPin = 36;
-AnalogStationController stationController(stationsPotPin);
-StationManager stationManager(stationController, audio, lcd);
+PotReader stationReader(stationsPotPin, 4);
+StationManager stationManager(stationReader, audio, lcd);
 
 void loop()
 {

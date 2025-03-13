@@ -1,21 +1,22 @@
 #ifndef VOLUME_MANAGER_H
 #define VOLUME_MANAGER_H
 
-#include "AnalogVolumeController.h"
+#include "PotReader.h"
 #include "Audio.h"
 
 class VolumeManager
 {
 private:
-    AnalogVolumeController &volumeController;
+    PotReader &volumeController;
     Audio &audio;
+    LCD &lcd;
     unsigned long lastUpdate = 0;
     int lastVolume = -1;
     const unsigned long updateInterval = 100; // 100ms update interval
 
 public:
-    VolumeManager(AnalogVolumeController &vc, Audio &aud)
-        : volumeController(vc), audio(aud) {}
+    VolumeManager(PotReader &vc, Audio &aud, LCD &lcdScreen)
+        : volumeController(vc), audio(aud), lcd(lcdScreen) {}
 
     void update()
     {
