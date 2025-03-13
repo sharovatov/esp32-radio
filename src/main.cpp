@@ -9,6 +9,8 @@
 #include "secrets.h"
 #include "AnalogVolumeController.h"
 #include "VolumeManager.h"
+#include "AnalogStationController.h"
+#include "StationManager.h"
 
 #include "esp32-hal-log.h"
 #define TAG "" // logging tag
@@ -42,9 +44,9 @@ Audio audio;
 void audio_init()
 {
 
-  const int I2S_BCLK = 26;
-  const int I2S_LRC = 25;
-  const int I2S_DOUT = 32;
+  constexpr int I2S_BCLK = 26;
+  constexpr int I2S_LRC = 25;
+  constexpr int I2S_DOUT = 32;
 
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
 
@@ -59,15 +61,12 @@ void setup()
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
-  ESP_LOGI(TAG, "Entering Setup function");
-  ESP_LOGI(TAG, "Heap initial size: %d bytes\n", ESP.getFreeHeap());
-  ESP_LOGI(TAG, "Starting LCD init");
+  ESP_LOGI(TAG, "Entering Setup function, heap size = %d bytes, starting LCD init", ESP.getFreeHeap());
 
   LCD lcd;
   lcd.begin();
 
-  ESP_LOGI(TAG, "Heap after LCD init: %d bytes\n", ESP.getFreeHeap());
-  ESP_LOGI(TAG, "Starting WIFI init");
+  ESP_LOGI(TAG, "Heap after LCD init: %d bytes, starting WiFi init\n", ESP.getFreeHeap());
 
   String wifi_ip_address = wifi_init();
   if (wifi_ip_address.isEmpty())
@@ -77,26 +76,32 @@ void setup()
     return;
   }
 
-  ESP_LOGI(TAG, "Done WIFI init");
-  ESP_LOGI(TAG, "Heap after wifi init: %d bytes\n", ESP.getFreeHeap());
-  lcd.print("WiFi connected", wifi_ip_address.c_str());
+  ESP_LOGI(TAG, "Done WIFI init, heap size = %d bytes, WiFi addr = %s", ESP.getFreeHeap(), wifi_ip_address.c_str());
 
   audio_init();
-  ESP_LOGI(TAG, "Done audio init");
-  ESP_LOGI(TAG, "Heap after audio init: %d bytes\n", ESP.getFreeHeap());
+
+  ESP_LOGI(TAG, "Done audio init, heap size = %d bytes\n", ESP.getFreeHeap());
   lcd.print("Playing", "classics");
 }
 
-// my potentiometer is on the 33rd GPIO
-const int potPin = 33;
-AnalogVolumeController volumeController(potPin);
+// volume pot is on GPIO 33
+constexpr int volumePotPin = 33;
+AnalogVolumeController volumeController(volumePotPin);
 VolumeManager volumeManager(volumeController, audio);
+
+// stations pot is on GPIO 36
+constexpr int stationsPotPin = 36;
+AnalogStationController stationController(stationsPotPin);
+StationManager stationManager(stationController, audio);
 
 void loop()
 {
   // keep streaming the audio
   audio.loop();
 
-  // keep reading the potentiometer and update the volume when needed
+  // keep reading the volume pot and update the volume when needed
   volumeManager.update();
+
+  // keep reading the stations pot and update the station when needed
+  stationManager.update();
 }
