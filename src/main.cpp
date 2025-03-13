@@ -53,8 +53,10 @@ void audio_init()
   // the volume level will be set in the loop() func upon the first time when the pot value is read
 
   // Play an online radio stream
-  audio.connecttohost("https://2.mystreaming.net:443/uber/crchopin/icecast.audio");
+  // audio.connecttohost("https://2.mystreaming.net:443/uber/crchopin/icecast.audio");
 }
+
+LCD lcd;
 
 void setup()
 {
@@ -63,7 +65,6 @@ void setup()
 
   ESP_LOGI(TAG, "Entering Setup function, heap size = %d bytes, starting LCD init", ESP.getFreeHeap());
 
-  LCD lcd;
   lcd.begin();
 
   ESP_LOGI(TAG, "Heap after LCD init: %d bytes, starting WiFi init\n", ESP.getFreeHeap());
@@ -72,7 +73,7 @@ void setup()
   if (wifi_ip_address.isEmpty())
   {
     ESP_LOGE(TAG, "Wifi init failed! Stopping...");
-    lcd.print("No WiFi conn!");
+    lcd.print("No WiFi :(");
     return;
   }
 
@@ -81,7 +82,7 @@ void setup()
   audio_init();
 
   ESP_LOGI(TAG, "Done audio init, heap size = %d bytes\n", ESP.getFreeHeap());
-  lcd.print("Playing", "classics");
+  lcd.print("Initializing...");
 }
 
 // volume pot is on GPIO 33
@@ -92,7 +93,7 @@ VolumeManager volumeManager(volumeController, audio);
 // stations pot is on GPIO 36
 constexpr int stationsPotPin = 36;
 AnalogStationController stationController(stationsPotPin);
-StationManager stationManager(stationController, audio);
+StationManager stationManager(stationController, audio, lcd);
 
 void loop()
 {
